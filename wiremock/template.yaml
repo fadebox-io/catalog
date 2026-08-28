@@ -1,0 +1,16 @@
+slug: wiremock
+name: WireMock
+version: 1.0.0
+description: HTTP mock server for stubbing third-party APIs — admin API and stubs via ingress.
+spec: |
+  services:
+    wiremock:
+      image: wiremock/wiremock:3.12.1
+      labels:
+        fadebox.ingress.port: "8080"
+      healthcheck:
+        test: [ "CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8080" ]
+        start_period: 10s
+        interval: 5s
+        timeout: 5s
+        retries: 12

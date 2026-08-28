@@ -1,0 +1,12 @@
+slug: mailpit
+name: Mailpit
+version: 1.0.0
+description: SMTP sink with a web inbox via ingress — for testing outgoing mail.
+spec: |
+  services:
+    mailpit:
+      image: axllent/mailpit:v1.21
+      labels:
+        fadebox.ingress.port: "8025"
+      ports:
+        - "1025"

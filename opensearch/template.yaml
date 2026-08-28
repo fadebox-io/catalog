@@ -1,0 +1,22 @@
+slug: opensearch
+name: OpenSearch
+version: 1.0.0
+description: Single-node OpenSearch 2 with the security plugin disabled and a 512 MB heap — the host needs vm.max_map_count ≥ 262144.
+spec: |
+  services:
+    opensearch:
+      image: opensearchproject/opensearch:2.19.1
+      environment:
+        discovery.type: single-node
+        bootstrap.memory_lock: "false"
+        DISABLE_SECURITY_PLUGIN: "true"
+        OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+      mem_limit: 1g
+      volumes:
+        - opensearch-data:/usr/share/opensearch/data
+      healthcheck:
+        test: [ "CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health" ]
+        start_period: 30s
+        interval: 10s
+        timeout: 5s
+        retries: 12

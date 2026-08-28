@@ -1,0 +1,21 @@
+slug: mssql
+name: SQL Server
+version: 1.0.0
+description: SQL Server 2022 Developer edition — importing accepts Microsoft's EULA; throwaway SA password `Passw0rd!` (the image enforces complexity rules).
+spec: |
+  services:
+    mssql:
+      image: mcr.microsoft.com/mssql/server:2022-latest
+      environment:
+        ACCEPT_EULA: "Y"
+        MSSQL_SA_PASSWORD: "Passw0rd!"
+        MSSQL_PID: Developer
+      mem_limit: 2g
+      volumes:
+        - mssql-data:/var/opt/mssql
+      healthcheck:
+        test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"Passw0rd!\" -Q 'SELECT 1' -b" ]
+        start_period: 30s
+        interval: 10s
+        timeout: 10s
+        retries: 12

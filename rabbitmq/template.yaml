@@ -1,0 +1,19 @@
+slug: rabbitmq
+name: RabbitMQ
+version: 1.0.0
+description: RabbitMQ 4 with the management UI exposed via ingress.
+spec: |
+  services:
+    rabbitmq:
+      image: rabbitmq:4-management-alpine
+      labels:
+        fadebox.ingress.port: "15672"
+      ports:
+        - "5672"
+      volumes:
+        - rabbitmq-data:/var/lib/rabbitmq
+      healthcheck:
+        test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+        interval: 10s
+        timeout: 10s
+        retries: 12

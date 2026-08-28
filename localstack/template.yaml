@@ -1,0 +1,16 @@
+slug: localstack
+name: LocalStack
+version: 1.0.0
+description: AWS API emulator (S3, SQS, SNS, DynamoDB, …) on port 4566 via ingress — compute services need the host Docker socket and are not available.
+spec: |
+  services:
+    localstack:
+      image: localstack/localstack:4.3
+      labels:
+        fadebox.ingress.port: "4566"
+      healthcheck:
+        test: [ "CMD-SHELL", "curl -sf http://localhost:4566/_localstack/health" ]
+        start_period: 30s
+        interval: 10s
+        timeout: 5s
+        retries: 12
