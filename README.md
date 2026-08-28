@@ -3,10 +3,11 @@
 The service-template catalog that ships with [Fadebox](https://fadebox.io) — databases, messaging,
 identity, search, storage, cloud emulators and dev tools, ready to import as templates.
 
-Every Fadebox installation already carries a copy of this catalog inside the application, so a
-fresh install has a populated Catalog page with no network access at all. This repository is the
-same catalog published as a git source, for installations that want entries as they are published
-rather than as each release ships them.
+**This repository is where the entries are maintained.** Every Fadebox build carries a copy of it
+inside the application — vendored at a pinned commit, so a fresh install has a populated Catalog
+page with no network access at all — and a release ships the entries it was tested with. Register
+this repository as a catalog source when you would rather have entries as they are published than
+as each release ships them.
 
 ## Using it
 
@@ -87,5 +88,6 @@ Apache-2.0 — see [LICENSE](LICENSE). The catalog is published under it so you 
 or use it as the starting point for a catalog of your own; Fadebox itself is a separate, commercial
 product.
 
-The entries are curated with the product, and the copy inside the Fadebox build is the source of
-truth: what is here is what that build ships.
+Entries are curated with the product and changed here. The copy inside a Fadebox build is taken
+from a commit of this repository and pinned, so what a build ships is a snapshot of this catalog
+rather than a second copy anyone edits.
