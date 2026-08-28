@@ -1,0 +1,21 @@
+slug: mysql
+name: MySQL
+version: 1.0.0
+description: Single-node MySQL 8.4 LTS with healthcheck and persistent storage — throwaway root/root, database `app` (mysql/mysql).
+spec: |
+  services:
+    mysql:
+      image: mysql:8.4
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: app
+        MYSQL_USER: mysql
+        MYSQL_PASSWORD: mysql
+      volumes:
+        - mysql-data:/var/lib/mysql
+      healthcheck:
+        test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1" ]
+        start_period: 30s
+        interval: 5s
+        timeout: 5s
+        retries: 12

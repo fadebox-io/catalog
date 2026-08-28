@@ -1,0 +1,55 @@
+slug: pgadmin
+name: pgAdmin
+version: 1.0.0
+description: pgAdmin 4 web UI via ingress (throwaway admin@example.com/admin) — pair with the PostgreSQL template, whose server is pre-registered and connects without a password prompt.
+spec: |
+  services:
+    pgadmin:
+      image: dpage/pgadmin4:9
+      environment:
+        PGADMIN_DEFAULT_EMAIL: admin@example.com
+        PGADMIN_DEFAULT_PASSWORD: admin
+        PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+        # The injected servers.json is at the image's default location; the passfile is not, and
+        # this is also what gets it installed with the 0600 libpq insists on — the entrypoint
+        # copies PGPASS_FILE into the login user's storage directory and chmods it there.
+        PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+        PGPASS_FILE: /pgpass
+      labels:
+        fadebox.ingress.port: "80"
+      volumes:
+        - pgadmin-data:/var/lib/pgadmin
+      healthcheck:
+        test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:80/misc/ping"]
+        start_period: 20s
+        interval: 10s
+        timeout: 5s
+        retries: 12
+files:
+  # Both files are read once, on the first start against an empty pgadmin-data volume: the servers
+  # are imported into pgAdmin's config database and the passfile is copied into the login user's
+  # storage. Editing them afterwards has no effect on an instance that already came up.
+  - serviceKey: pgadmin
+    targetPath: /pgadmin4/servers.json
+    content: |
+      {
+        "Servers": {
+          "1": {
+            "Name": "PostgreSQL",
+            "Group": "Servers",
+            "Host": "{{service.postgres.host}}",
+            "Port": 5432,
+            "MaintenanceDB": "{{service.postgres.env.POSTGRES_DB}}",
+            "Username": "{{service.postgres.env.POSTGRES_USER}}",
+            "ConnectionParameters": {
+              "sslmode": "prefer",
+              "passfile": "/.pgpass"
+            }
+          }
+        }
+      }
+  - serviceKey: pgadmin
+    targetPath: /pgpass
+    content: |
+      # host:port:database:user:password — a ':' or '\' in the password must be backslash-escaped.
+      {{service.postgres.host}}:5432:*:{{service.postgres.env.POSTGRES_USER}}:{{service.postgres.env.POSTGRES_PASSWORD}}

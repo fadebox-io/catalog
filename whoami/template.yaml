@@ -1,0 +1,10 @@
+slug: whoami
+name: Whoami (demo)
+version: 1.0.0
+description: Tiny HTTP echo service — handy for verifying ingress and routing.
+spec: |
+  services:
+    whoami:
+      image: traefik/whoami:v1.10
+      labels:
+        fadebox.ingress.port: "80"

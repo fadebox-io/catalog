@@ -1,0 +1,21 @@
+slug: mariadb
+name: MariaDB
+version: 1.0.0
+description: Single-node MariaDB 11.8 LTS with healthcheck and persistent storage.
+spec: |
+  services:
+    mariadb:
+      image: mariadb:11.8
+      environment:
+        MARIADB_ROOT_PASSWORD: mariadb
+        MARIADB_USER: mariadb
+        MARIADB_PASSWORD: mariadb
+        MARIADB_DATABASE: mariadb
+      volumes:
+        - mariadb-data:/var/lib/mysql
+      healthcheck:
+        test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+        start_period: 20s
+        interval: 5s
+        timeout: 5s
+        retries: 12

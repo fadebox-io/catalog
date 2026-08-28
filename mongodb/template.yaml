@@ -1,0 +1,19 @@
+slug: mongodb
+name: MongoDB
+version: 1.0.0
+description: Single-node MongoDB 8 with healthcheck and persistent storage — throwaway root user mongo/mongo.
+spec: |
+  services:
+    mongodb:
+      image: mongo:8.0
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: mongo
+        MONGO_INITDB_ROOT_PASSWORD: mongo
+      volumes:
+        - mongodb-data:/data/db
+      healthcheck:
+        test: [ "CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand({ping: 1})'" ]
+        start_period: 20s
+        interval: 5s
+        timeout: 5s
+        retries: 12
