@@ -16,7 +16,7 @@ In Fadebox: **Catalog → Add source**, with
 | Field | Value |
 | --- | --- |
 | Slug | `official` (or whatever you like — it is recorded on the templates you import) |
-| Repository URL | `https://github.com/fadebox-io/fadebox-catalog.git` |
+| Repository URL | `https://github.com/fadebox-io/catalog.git` |
 | Branch or tag | `master` |
 
 Entries are then browsable beside the bundled ones. Importing one copies it into an ordinary,
