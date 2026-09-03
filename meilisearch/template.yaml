@@ -1,0 +1,20 @@
+slug: meilisearch
+name: Meilisearch
+version: 1.0.0
+description: Meilisearch 1.53 with persistent storage — throwaway master key `masterKey-throwaway-0123`; API and search preview on 7700 via ingress.
+spec: |
+  services:
+    meilisearch:
+      image: getmeili/meilisearch:v1.53
+      environment:
+        MEILI_ENV: development
+        MEILI_MASTER_KEY: masterKey-throwaway-0123
+      volumes:
+        - meilisearch-data:/meili_data
+      labels:
+        fadebox.ingress.port: "7700"
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+        interval: 5s
+        timeout: 3s
+        retries: 10
