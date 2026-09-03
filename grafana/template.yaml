@@ -1,0 +1,32 @@
+slug: grafana
+name: Grafana
+version: 1.0.0
+description: Grafana 13 with a provisioned Prometheus data source — pair with the Prometheus template; throwaway admin/admin, UI via ingress.
+spec: |
+  services:
+    grafana:
+      image: grafana/grafana:13.2.1
+      environment:
+        GF_SECURITY_ADMIN_USER: admin
+        GF_SECURITY_ADMIN_PASSWORD: admin
+      volumes:
+        - grafana-data:/var/lib/grafana
+      labels:
+        fadebox.ingress.port: "3000"
+      healthcheck:
+        test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+        start_period: 15s
+        interval: 5s
+        timeout: 3s
+        retries: 12
+files:
+  - serviceKey: grafana
+    targetPath: /etc/grafana/provisioning/datasources/prometheus.yaml
+    content: |
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://{{service.prometheus.host}}:9090
+          isDefault: true

@@ -1,0 +1,18 @@
+slug: valkey
+name: Valkey
+version: 1.0.0
+description: Valkey 9 (the Redis fork) with append-only persistence and healthcheck — a drop-in Redis replacement on port 6379, no auth.
+spec: |
+  services:
+    valkey:
+      image: valkey/valkey:9.1-alpine
+      command: ["valkey-server", "--appendonly", "yes"]
+      ports:
+        - "6379"
+      volumes:
+        - valkey-data:/data
+      healthcheck:
+        test: ["CMD", "valkey-cli", "ping"]
+        interval: 5s
+        timeout: 3s
+        retries: 10
