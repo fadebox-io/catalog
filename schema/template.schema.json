@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/fadebox-io/catalog/master/schema/template.schema.json",
+  "title": "fadebox catalog entry",
+  "description": "<entry>/template.yaml: the payload an import copies into an editable fadebox template. Fadebox reads it when the entry is opened and again on import; the spec is parsed by the same Compose parser the template editor uses.",
+  "type": "object",
+  "required": ["slug", "spec"],
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "maxLength": 40,
+      "description": "The same slug as the index row. It becomes the imported template's identifier unless the importer chooses another."
+    },
+    "name": {
+      "type": "string",
+      "description": "The imported template's display name, unless the importer chooses another."
+    },
+    "version": {
+      "type": "string",
+      "description": "The same version as the index row; recorded on the imported template."
+    },
+    "description": {
+      "type": "string"
+    },
+    "spec": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A Docker Compose document as a YAML block scalar: exactly one main service plus helpers labelled fadebox.role: init or fadebox.role: sidecar. The Compose subset is static and strict — an unsupported key is refused on import. See https://fadebox.io/docs/guides/template-authoring."
+    },
+    "files": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/file" },
+      "description": "Files injected into a container at deploy time — an init script, a config file."
+    }
+  },
+  "$defs": {
+    "file": {
+      "type": "object",
+      "required": ["serviceKey", "targetPath", "content"],
+      "properties": {
+        "serviceKey": {
+          "type": "string",
+          "description": "The service in spec the file is injected into."
+        },
+        "targetPath": {
+          "type": "string",
+          "pattern": "^/.*[^/]$",
+          "description": "Absolute path inside the container. It must not sit inside one of that service's volume mounts, where the mount would shadow it."
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 1048576,
+          "description": "The file's text, at most 1 MiB."
+        }
+      }
+    }
+  }
+}
