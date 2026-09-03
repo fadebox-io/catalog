@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=./schema/index.schema.json
 apiVersion: fadebox.catalog/v1
 name: Fadebox Official
 entries:
