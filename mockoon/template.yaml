@@ -1,0 +1,37 @@
+slug: mockoon
+name: Mockoon
+version: 1.0.0
+description: Mockoon CLI serving the injected OpenAPI document as a mock API on 3000 via ingress — replace api.yaml with your own spec.
+spec: |
+  services:
+    mockoon:
+      image: mockoon/cli:9.8.0
+      command: ["--data", "/data/api.yaml", "--port", "3000"]
+      labels:
+        fadebox.ingress.port: "3000"
+      healthcheck:
+        test: ["CMD", "wget", "-qO-", "http://localhost:3000/hello"]
+        start_period: 10s
+        interval: 5s
+        timeout: 3s
+        retries: 10
+files:
+  - serviceKey: mockoon
+    targetPath: /data/api.yaml
+    content: |
+      # Any OpenAPI 3 document works here; Mockoon answers each operation with its example.
+      openapi: 3.0.3
+      info:
+        title: Mock API
+        version: "1.0"
+      paths:
+        /hello:
+          get:
+            summary: Says hello
+            responses:
+              "200":
+                description: OK
+                content:
+                  application/json:
+                    example:
+                      hello: world

@@ -33,12 +33,30 @@ entries:
     description: Single-node MongoDB 8 with healthcheck and persistent storage — throwaway root user mongo/mongo.
     tags: [ database ]
     path: mongodb/template.yaml
+  - slug: clickhouse
+    name: ClickHouse
+    version: 1.0.0
+    description: ClickHouse 26.8 LTS single node with persistent storage — throwaway user default/clickhouse, native port 9000, HTTP interface on 8123 via ingress.
+    tags: [ database ]
+    path: clickhouse/template.yaml
   - slug: redis
     name: Redis
     version: 1.0.0
     description: Redis 7 with append-only persistence and healthcheck.
     tags: [ cache, database ]
     path: redis/template.yaml
+  - slug: valkey
+    name: Valkey
+    version: 1.0.0
+    description: Valkey 9 (the Redis fork) with append-only persistence and healthcheck — a drop-in Redis replacement on port 6379, no auth.
+    tags: [ cache, database ]
+    path: valkey/template.yaml
+  - slug: memcached
+    name: Memcached
+    version: 1.0.0
+    description: Memcached 1.6 with 64 MB of cache on port 11211, no auth.
+    tags: [ cache ]
+    path: memcached/template.yaml
   # Messaging
   - slug: rabbitmq
     name: RabbitMQ
@@ -52,6 +70,24 @@ entries:
     description: Apache Kafka 3.9 in single-node KRaft mode with persistent storage — add under the service name `kafka`, which its advertised listener hardcodes.
     tags: [ messaging ]
     path: kafka/template.yaml
+  - slug: nats
+    name: NATS
+    version: 1.0.0
+    description: NATS 2.14 single node with JetStream persistence — clients on 4222, no auth; monitoring page via ingress.
+    tags: [ messaging ]
+    path: nats/template.yaml
+  - slug: redpanda
+    name: Redpanda
+    version: 1.0.0
+    description: Redpanda 26 single node, Kafka-compatible on 9092 with persistent storage — add under the service name `redpanda`, which its advertised listener hardcodes.
+    tags: [ messaging ]
+    path: redpanda/template.yaml
+  - slug: mosquitto
+    name: Eclipse Mosquitto
+    version: 1.0.0
+    description: Mosquitto 2.0 MQTT broker on 1883 with anonymous access and persistence — the injected mosquitto.conf is where auth and extra listeners go.
+    tags: [ messaging ]
+    path: mosquitto/template.yaml
   # Auth
   - slug: keycloak
     name: Keycloak
@@ -66,6 +102,13 @@ entries:
     tags: [ auth ]
     requires: [ postgres ]
     path: keycloak-postgres/template.yaml
+  - slug: keycloak-mysql
+    name: Keycloak (MySQL)
+    version: 1.0.0
+    description: Keycloak 26 in dev mode (throwaway admin/admin) backed by MySQL — pair with the MySQL template, UI via ingress.
+    tags: [ auth ]
+    requires: [ mysql ]
+    path: keycloak-mysql/template.yaml
   # Search & storage
   - slug: opensearch
     name: OpenSearch
@@ -85,6 +128,12 @@ entries:
     description: S3-compatible object storage with persistent data (throwaway minioadmin/minioadmin), console UI via ingress, S3 API on port 9000.
     tags: [ storage ]
     path: minio/template.yaml
+  - slug: meilisearch
+    name: Meilisearch
+    version: 1.0.0
+    description: Meilisearch 1.53 with persistent storage — throwaway master key `masterKey-throwaway-0123`; API and search preview on 7700 via ingress.
+    tags: [ search ]
+    path: meilisearch/template.yaml
   # Cloud emulators
   - slug: localstack
     name: LocalStack
@@ -98,6 +147,26 @@ entries:
     description: Azure Storage emulator (blob 10000, queue 10001, table 10002) with the standard devstoreaccount1 account and persistent storage.
     tags: [ emulator, testing ]
     path: azurite/template.yaml
+  # Observability
+  - slug: prometheus
+    name: Prometheus
+    version: 1.0.0
+    description: Prometheus 3 with persistent storage and the UI via ingress — scrapes itself out of the box; add your targets in the injected prometheus.yml.
+    tags: [ observability ]
+    path: prometheus/template.yaml
+  - slug: grafana
+    name: Grafana
+    version: 1.0.0
+    description: Grafana 13 with a provisioned Prometheus data source — pair with the Prometheus template; throwaway admin/admin, UI via ingress.
+    tags: [ observability ]
+    requires: [ prometheus ]
+    path: grafana/template.yaml
+  - slug: jaeger
+    name: Jaeger
+    version: 1.0.0
+    description: Jaeger 2 all-in-one with in-memory storage — send traces over OTLP to 4317 (gRPC) or 4318 (HTTP); UI via ingress.
+    tags: [ observability ]
+    path: jaeger/template.yaml
   # Dev tools
   - slug: wiremock
     name: WireMock
@@ -105,6 +174,12 @@ entries:
     description: HTTP mock server for stubbing third-party APIs — admin API and stubs via ingress.
     tags: [ mock, testing ]
     path: wiremock/template.yaml
+  - slug: mockoon
+    name: Mockoon
+    version: 1.0.0
+    description: Mockoon CLI serving the injected OpenAPI document as a mock API on 3000 via ingress — replace api.yaml with your own spec.
+    tags: [ mock, testing ]
+    path: mockoon/template.yaml
   - slug: pgadmin
     name: pgAdmin
     version: 1.0.0
@@ -112,12 +187,24 @@ entries:
     tags: [ database, tools ]
     requires: [ postgres ]
     path: pgadmin/template.yaml
+  - slug: adminer
+    name: Adminer
+    version: 1.0.0
+    description: Adminer 6 — one web UI for PostgreSQL, MySQL, MariaDB, SQL Server and MongoDB via ingress; the server field defaults to `postgres`, the well-known PostgreSQL service name.
+    tags: [ tools ]
+    path: adminer/template.yaml
   - slug: mailpit
     name: Mailpit
     version: 1.0.0
     description: SMTP sink with a web inbox via ingress — for testing outgoing mail.
     tags: [ mail, testing ]
     path: mailpit/template.yaml
+  - slug: smtp4dev
+    name: smtp4dev
+    version: 1.0.0
+    description: SMTP sink with a web inbox via ingress, the .NET world's Mailpit — SMTP on 25, no auth.
+    tags: [ mail, tools ]
+    path: smtp4dev/template.yaml
   - slug: whoami
     name: Whoami (demo)
     version: 1.0.0

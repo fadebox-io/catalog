@@ -1,0 +1,17 @@
+slug: adminer
+name: Adminer
+version: 1.0.0
+description: Adminer 6 — one web UI for PostgreSQL, MySQL, MariaDB, SQL Server and MongoDB via ingress; the server field defaults to `postgres`, the well-known PostgreSQL service name.
+spec: |
+  services:
+    adminer:
+      image: adminer:6
+      environment:
+        ADMINER_DEFAULT_SERVER: postgres
+      labels:
+        fadebox.ingress.port: "8080"
+      healthcheck:
+        test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 8080) ? 0 : 1);"]
+        interval: 5s
+        timeout: 3s
+        retries: 10

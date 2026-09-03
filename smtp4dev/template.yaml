@@ -1,0 +1,20 @@
+slug: smtp4dev
+name: smtp4dev
+version: 1.0.0
+description: SMTP sink with a web inbox via ingress, the .NET world's Mailpit — SMTP on 25, no auth.
+spec: |
+  services:
+    smtp4dev:
+      image: rnwood/smtp4dev:3.15.0
+      ports:
+        - "25"
+      volumes:
+        - smtp4dev-data:/smtp4dev
+      labels:
+        fadebox.ingress.port: "80"
+      healthcheck:
+        test: ["CMD", "curl", "-fsS", "http://localhost/"]
+        start_period: 10s
+        interval: 5s
+        timeout: 3s
+        retries: 12

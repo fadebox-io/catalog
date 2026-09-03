@@ -1,0 +1,25 @@
+slug: clickhouse
+name: ClickHouse
+version: 1.0.0
+description: ClickHouse 26.8 LTS single node with persistent storage — throwaway user default/clickhouse, native port 9000, HTTP interface on 8123 via ingress.
+spec: |
+  services:
+    clickhouse:
+      image: clickhouse/clickhouse-server:26.8
+      environment:
+        CLICKHOUSE_USER: default
+        CLICKHOUSE_PASSWORD: clickhouse
+        CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+      ports:
+        - "9000"
+        - "8123"
+      volumes:
+        - clickhouse-data:/var/lib/clickhouse
+      labels:
+        fadebox.ingress.port: "8123"
+      healthcheck:
+        test: ["CMD", "clickhouse-client", "--password", "clickhouse", "--query", "SELECT 1"]
+        start_period: 20s
+        interval: 5s
+        timeout: 5s
+        retries: 12

@@ -1,0 +1,25 @@
+slug: mosquitto
+name: Eclipse Mosquitto
+version: 1.0.0
+description: Mosquitto 2.0 MQTT broker on 1883 with anonymous access and persistence — the injected mosquitto.conf is where auth and extra listeners go.
+spec: |
+  services:
+    mosquitto:
+      image: eclipse-mosquitto:2.0
+      ports:
+        - "1883"
+      volumes:
+        - mosquitto-data:/mosquitto/data
+      healthcheck:
+        test: ["CMD", "mosquitto_sub", "-t", "$SYS/broker/uptime", "-C", "1", "-i", "healthcheck", "-W", "3"]
+        interval: 5s
+        timeout: 5s
+        retries: 10
+files:
+  - serviceKey: mosquitto
+    targetPath: /mosquitto/config/mosquitto.conf
+    content: |
+      listener 1883
+      allow_anonymous true
+      persistence true
+      persistence_location /mosquitto/data/
