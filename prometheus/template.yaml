@@ -1,0 +1,29 @@
+slug: prometheus
+name: Prometheus
+version: 1.0.0
+description: Prometheus 3 with persistent storage and the UI via ingress — scrapes itself out of the box; add your targets in the injected prometheus.yml.
+spec: |
+  services:
+    prometheus:
+      image: prom/prometheus:v3.14.0
+      volumes:
+        - prometheus-data:/prometheus
+      labels:
+        fadebox.ingress.port: "9090"
+      healthcheck:
+        test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+        start_period: 10s
+        interval: 5s
+        timeout: 3s
+        retries: 12
+files:
+  - serviceKey: prometheus
+    targetPath: /etc/prometheus/prometheus.yml
+    content: |
+      # Scrape targets by their service name in the environment, e.g. app:8080.
+      global:
+        scrape_interval: 15s
+      scrape_configs:
+        - job_name: prometheus
+          static_configs:
+            - targets: ["localhost:9090"]

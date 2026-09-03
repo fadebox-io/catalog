@@ -1,0 +1,19 @@
+slug: jaeger
+name: Jaeger
+version: 1.0.0
+description: Jaeger 2 all-in-one with in-memory storage — send traces over OTLP to 4317 (gRPC) or 4318 (HTTP); UI via ingress.
+spec: |
+  services:
+    jaeger:
+      image: jaegertracing/jaeger:2.20.0
+      ports:
+        - "4317"
+        - "4318"
+      labels:
+        fadebox.ingress.port: "16686"
+      healthcheck:
+        test: ["CMD", "wget", "-qO-", "http://localhost:13133/status"]
+        start_period: 10s
+        interval: 5s
+        timeout: 3s
+        retries: 10

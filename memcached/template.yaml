@@ -1,0 +1,16 @@
+slug: memcached
+name: Memcached
+version: 1.0.0
+description: Memcached 1.6 with 64 MB of cache on port 11211, no auth.
+spec: |
+  services:
+    memcached:
+      image: memcached:1.6-alpine
+      command: ["memcached", "-m", "64"]
+      ports:
+        - "11211"
+      healthcheck:
+        test: ["CMD-SHELL", "printf 'version\\r\\nquit\\r\\n' | nc 127.0.0.1 11211 | grep -q VERSION"]
+        interval: 5s
+        timeout: 3s
+        retries: 10
