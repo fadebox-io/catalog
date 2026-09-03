@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/fadebox-io/catalog/master/schema/index.schema.json",
+  "title": "fadebox catalog index",
+  "description": "index.yaml at the root of a catalog: browsing metadata for every entry. Fadebox reads exactly this on sync and refuses the whole catalog when it is malformed; unknown properties are ignored so a catalog written for a later fadebox still parses.",
+  "type": "object",
+  "required": ["apiVersion", "entries"],
+  "properties": {
+    "apiVersion": {
+      "const": "fadebox.catalog/v1",
+      "description": "The one format version fadebox reads. Anything else refuses the catalog whole rather than half-understood."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human label for the catalog, shown beside its entries."
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": ["slug", "path"],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "maxLength": 40,
+          "description": "Stable identifier. Templates imported from the entry record it as provenance; renaming it orphans every copy, which then stops reporting updates."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name, shown on the catalog card."
+        },
+        "version": {
+          "type": "string",
+          "description": "The only update signal: a new commit with an unchanged version is not an update. Bump it whenever template.yaml changes."
+        },
+        "description": {
+          "type": "string",
+          "description": "One sentence for the card. State any throwaway credentials the entry ships with."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Free-form facets for filtering, e.g. database, messaging, auth."
+        },
+        "requires": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Slugs of entries this one expects at their well-known service names — what the import dialog hints at pairing."
+        },
+        "path": {
+          "type": "string",
+          "description": "Path of the entry's template.yaml, relative to the catalog root."
+        }
+      }
+    }
+  }
+}

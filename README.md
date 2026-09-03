@@ -76,6 +76,11 @@ Writing your own catalog is the same shape: copy this repository's layout, keep 
 and register it as a source. See the [Catalog sources
 guide](https://fadebox.io/docs/guides/catalog-sources).
 
+`schema/` holds JSON Schemas for both files, which an editor picks up through the
+`# yaml-language-server: $schema=…` line at the top of `index.yaml`. [`AGENTS.md`](AGENTS.md) is
+the same guide written for a coding agent, including how to validate and prove an entry against
+a fadebox installation over MCP before publishing it.
+
 ## Credentials in these entries
 
 Every entry ships throwaway development credentials, stated in its description on purpose
