@@ -1,0 +1,27 @@
+slug: keycloak-mysql
+name: Keycloak (MySQL)
+version: 1.0.0
+description: Keycloak 26 in dev mode (throwaway admin/admin) backed by MySQL — pair with the MySQL template, UI via ingress.
+spec: |
+  services:
+    keycloak:
+      image: quay.io/keycloak/keycloak:26.7
+      command: ["start-dev"]
+      environment:
+        KC_BOOTSTRAP_ADMIN_USERNAME: admin
+        KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+        KC_PROXY_HEADERS: xforwarded
+        KC_HTTP_ENABLED: "true"
+        KC_HEALTH_ENABLED: "true"
+        KC_DB: mysql
+        KC_DB_URL: jdbc:mysql://{{service.mysql.host}}:3306/{{service.mysql.env.MYSQL_DATABASE}}
+        KC_DB_USERNAME: "{{service.mysql.env.MYSQL_USER}}"
+        KC_DB_PASSWORD: "{{service.mysql.env.MYSQL_PASSWORD}}"
+      labels:
+        fadebox.ingress.port: "8080"
+      healthcheck:
+        test: [ "CMD-SHELL", "[ -f /tmp/HealthCheck.java ] || echo \"public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { java.net.URI uri = java.net.URI.create(args[0]); System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)uri.toURL().openConnection()).getResponseCode() ? 0 : 1); } }\" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:9000/health/live" ]
+        start_period: 30s
+        interval: 10s
+        timeout: 10s
+        retries: 30

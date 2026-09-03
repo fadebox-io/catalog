@@ -76,6 +76,18 @@ entries:
     description: NATS 2.14 single node with JetStream persistence — clients on 4222, no auth; monitoring page via ingress.
     tags: [ messaging ]
     path: nats/template.yaml
+  - slug: redpanda
+    name: Redpanda
+    version: 1.0.0
+    description: Redpanda 26 single node, Kafka-compatible on 9092 with persistent storage — add under the service name `redpanda`, which its advertised listener hardcodes.
+    tags: [ messaging ]
+    path: redpanda/template.yaml
+  - slug: mosquitto
+    name: Eclipse Mosquitto
+    version: 1.0.0
+    description: Mosquitto 2.0 MQTT broker on 1883 with anonymous access and persistence — the injected mosquitto.conf is where auth and extra listeners go.
+    tags: [ messaging ]
+    path: mosquitto/template.yaml
   # Auth
   - slug: keycloak
     name: Keycloak
@@ -90,6 +102,13 @@ entries:
     tags: [ auth ]
     requires: [ postgres ]
     path: keycloak-postgres/template.yaml
+  - slug: keycloak-mysql
+    name: Keycloak (MySQL)
+    version: 1.0.0
+    description: Keycloak 26 in dev mode (throwaway admin/admin) backed by MySQL — pair with the MySQL template, UI via ingress.
+    tags: [ auth ]
+    requires: [ mysql ]
+    path: keycloak-mysql/template.yaml
   # Search & storage
   - slug: opensearch
     name: OpenSearch
@@ -109,6 +128,12 @@ entries:
     description: S3-compatible object storage with persistent data (throwaway minioadmin/minioadmin), console UI via ingress, S3 API on port 9000.
     tags: [ storage ]
     path: minio/template.yaml
+  - slug: meilisearch
+    name: Meilisearch
+    version: 1.0.0
+    description: Meilisearch 1.53 with persistent storage — throwaway master key `masterKey-throwaway-0123`; API and search preview on 7700 via ingress.
+    tags: [ search ]
+    path: meilisearch/template.yaml
   # Cloud emulators
   - slug: localstack
     name: LocalStack
@@ -149,6 +174,12 @@ entries:
     description: HTTP mock server for stubbing third-party APIs — admin API and stubs via ingress.
     tags: [ mock, testing ]
     path: wiremock/template.yaml
+  - slug: mockoon
+    name: Mockoon
+    version: 1.0.0
+    description: Mockoon CLI serving the injected OpenAPI document as a mock API on 3000 via ingress — replace api.yaml with your own spec.
+    tags: [ mock, testing ]
+    path: mockoon/template.yaml
   - slug: pgadmin
     name: pgAdmin
     version: 1.0.0
@@ -156,12 +187,24 @@ entries:
     tags: [ database, tools ]
     requires: [ postgres ]
     path: pgadmin/template.yaml
+  - slug: adminer
+    name: Adminer
+    version: 1.0.0
+    description: Adminer 6 — one web UI for PostgreSQL, MySQL, MariaDB, SQL Server and MongoDB via ingress; the server field defaults to `postgres`, the well-known PostgreSQL service name.
+    tags: [ tools ]
+    path: adminer/template.yaml
   - slug: mailpit
     name: Mailpit
     version: 1.0.0
     description: SMTP sink with a web inbox via ingress — for testing outgoing mail.
     tags: [ mail, testing ]
     path: mailpit/template.yaml
+  - slug: smtp4dev
+    name: smtp4dev
+    version: 1.0.0
+    description: SMTP sink with a web inbox via ingress, the .NET world's Mailpit — SMTP on 25, no auth.
+    tags: [ mail, tools ]
+    path: smtp4dev/template.yaml
   - slug: whoami
     name: Whoami (demo)
     version: 1.0.0
