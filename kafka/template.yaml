@@ -1,7 +1,7 @@
 slug: kafka
 name: Apache Kafka
-version: 1.0.0
-description: Apache Kafka 3.9 in single-node KRaft mode with persistent storage — add under the service name `kafka`, which its advertised listener hardcodes.
+version: 1.1.0
+description: Apache Kafka 3.9 in single-node KRaft mode with persistent storage — add under the service name `kafka`, which its advertised listener hardcodes; services in the instance use kafka:9092, a laptop running `fadebox connect` uses localhost:19092. For native access add a listener advertising `{{service.kafka.address}}:29092` — the spec's comments say how; it is left out because that placeholder fails a deploy without native access.
 spec: |
   services:
     kafka:
@@ -10,16 +10,33 @@ spec: |
         CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
         KAFKA_NODE_ID: "1"
         KAFKA_PROCESS_ROLES: broker,controller
-        KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+        # Two client listeners, because a Kafka client reconnects to whatever the broker
+        # advertises, not to the address it bootstrapped from:
+        # - PLAINTEXT (9092) advertises kafka:9092, for services inside the instance.
+        # - EXTERNAL (19092) advertises localhost:19092, for a laptop running
+        #   `fadebox connect <instance>`, which opens localhost:19092 when that port is free.
+        #   If connect has to pick another local port, change the advertised one to match.
+        # Native access: the laptop reaches the broker at its fixed address instead, so that needs
+        # a third listener advertising the address. Add NATIVE://0.0.0.0:29092 to KAFKA_LISTENERS,
+        # NATIVE://ADDR:29092 to KAFKA_ADVERTISED_LISTENERS, NATIVE:PLAINTEXT to
+        # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP and "29092" to ports, where ADDR is the
+        # service.kafka.address placeholder in double braces; then bootstrap from the address
+        # the instance drawer shows, port 29092. It is not here by default because that
+        # placeholder fails the deploy of an instance with no subnet (native access off).
+        KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:19092,CONTROLLER://0.0.0.0:9093
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:19092
         KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+        KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
         KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
         KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
         KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
         KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
         KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
         KAFKA_LOG_DIRS: /var/lib/kafka/data
+      # The image exposes 9092 only; declaring 19092 is what makes `fadebox connect` list it.
+      ports:
+        - "19092"
       mem_limit: 1g
       volumes:
         - kafka-data:/var/lib/kafka/data
