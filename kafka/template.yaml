@@ -1,7 +1,7 @@
 slug: kafka
 name: Apache Kafka
 version: 1.1.0
-description: Apache Kafka 3.9 in single-node KRaft mode with persistent storage — add under the service name `kafka`, which its advertised listener hardcodes; services in the instance use kafka:9092, a laptop running `fadebox connect` uses localhost:19092. For native access add a listener advertising `{{service.kafka.address}}:29092` — the spec's comments say how; it is left out because that placeholder fails a deploy without native access.
+description: Apache Kafka 3.9 in single-node KRaft mode with persistent storage — add under the service name `kafka`, which its advertised listener hardcodes; services in the instance use kafka:9092. A laptop uses localhost:19092 through `fadebox connect` (fadebox 1.5 or later), and only one connected Kafka or Redpanda per laptop at a time, because the broker advertises localhost:19092; when that port is taken connect maps another one, and a client bootstrapping from it is sent back to the first broker. For native access add a listener advertising `{{service.kafka.address}}:29092` — the spec's comments say how; it is left out because that placeholder fails a deploy without native access.
 spec: |
   services:
     kafka:
@@ -19,7 +19,7 @@ spec: |
         # Native access: the laptop reaches the broker at its fixed address instead, so that needs
         # a third listener advertising the address. Add NATIVE://0.0.0.0:29092 to KAFKA_LISTENERS,
         # NATIVE://ADDR:29092 to KAFKA_ADVERTISED_LISTENERS, NATIVE:PLAINTEXT to
-        # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP and "29092" to ports, where ADDR is the
+        # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP and "29092" to expose, where ADDR is the
         # service.kafka.address placeholder in double braces; then bootstrap from the address
         # the instance drawer shows, port 29092. It is not here by default because that
         # placeholder fails the deploy of an instance with no subnet (native access off).
@@ -35,7 +35,8 @@ spec: |
         KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
         KAFKA_LOG_DIRS: /var/lib/kafka/data
       # The image exposes 9092 only; declaring 19092 is what makes `fadebox connect` list it.
-      ports:
+      # expose, not ports: it publishes no host port (needs fadebox 1.5 or later).
+      expose:
         - "19092"
       mem_limit: 1g
       volumes:
