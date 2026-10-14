@@ -122,12 +122,12 @@ entries:
     description: Single-node Elasticsearch 8 with security disabled and a 512 MB heap — the host needs vm.max_map_count ≥ 262144.
     tags: [ search ]
     path: elasticsearch/template.yaml
-  - slug: minio
-    name: MinIO
+  - slug: rustfs
+    name: RustFS
     version: 1.0.0
-    description: S3-compatible object storage with persistent data (throwaway minioadmin/minioadmin), console UI via ingress, S3 API on port 9000.
+    description: S3-compatible object storage (RustFS 1.0, Apache-2.0) with persistent data (throwaway rustfsadmin/rustfsadmin), console UI via ingress, S3 API on port 9000 — replaces the MinIO entry, whose images are no longer published.
     tags: [ storage ]
-    path: minio/template.yaml
+    path: rustfs/template.yaml
   - slug: meilisearch
     name: Meilisearch
     version: 1.0.0
