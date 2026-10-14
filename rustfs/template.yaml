@@ -1,0 +1,31 @@
+slug: rustfs
+name: RustFS
+version: 1.0.0
+description: S3-compatible object storage (RustFS 1.0, Apache-2.0) with persistent data (throwaway rustfsadmin/rustfsadmin), console UI via ingress, S3 API on port 9000 — replaces the MinIO entry, whose images are no longer published.
+spec: |
+  services:
+    rustfs:
+      image: rustfs/rustfs:1.0.1
+      # Clients use path-style addressing (force_path_style / forcePathStyle); for
+      # virtual-hosted style, add RUSTFS_SERVER_DOMAINS set to the host name clients use.
+      environment:
+        RUSTFS_ACCESS_KEY: rustfsadmin
+        RUSTFS_SECRET_KEY: rustfsadmin
+        RUSTFS_ADDRESS: ":9000"
+        RUSTFS_CONSOLE_ENABLE: "true"
+        RUSTFS_CONSOLE_ADDRESS: ":9001"
+        # Empty sends the server log to stdout, where the instance's logs show it, instead of a
+        # file under /logs inside the container.
+        RUSTFS_OBS_LOG_DIRECTORY: ""
+      labels:
+        fadebox.ingress.port: "9001"
+      # The image exposes 9000 (S3 API) and 9001 (console), so `fadebox connect` lists both
+      # without a ports or expose entry, and no host port is published.
+      volumes:
+        - rustfs-data:/data
+      healthcheck:
+        test: [ "CMD-SHELL", "curl -fsS -o /dev/null http://localhost:9000/health/ready && curl -fsS -o /dev/null http://localhost:9001/rustfs/console/health" ]
+        start_period: 10s
+        interval: 5s
+        timeout: 5s
+        retries: 12
