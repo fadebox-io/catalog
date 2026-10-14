@@ -1,11 +1,27 @@
 slug: redpanda
 name: Redpanda
-version: 1.0.0
-description: Redpanda 26 single node, Kafka-compatible on 9092 with persistent storage — add under the service name `redpanda`, which its advertised listener hardcodes.
+version: 1.1.0
+description: Redpanda 26 single node, Kafka-compatible with persistent storage — add under the service name `redpanda`, which its advertised listener hardcodes; services in the instance use redpanda:9092. A laptop uses localhost:19092 through `fadebox connect` (fadebox 1.5 or later), and only one connected Kafka or Redpanda per laptop at a time, because the broker advertises localhost:19092; when that port is taken connect maps another one, and a client bootstrapping from it is sent back to the first broker. For native access add a listener advertising `{{service.redpanda.address}}:29092` — the spec's comments say how; it is left out because that placeholder fails a deploy without native access.
 spec: |
   services:
     redpanda:
       image: redpandadata/redpanda:v26.2.2
+      # Two Kafka listeners, because a Kafka client reconnects to whatever the broker advertises,
+      # not to the address it bootstrapped from:
+      # - internal (9092) advertises redpanda:9092, for services inside the instance.
+      # - external (19092) advertises localhost:19092, for a laptop running
+      #   `fadebox connect <instance>`, which opens localhost:19092 when that port is free.
+      #   If connect has to pick another local port, change the advertised one to match.
+      # Native access: the laptop reaches the broker at its fixed address instead, so that needs
+      # a third listener advertising the address. Placeholders resolve in environment values,
+      # not in command, so pass it through one: add NATIVE_ADDR set to the
+      # service.redpanda.address placeholder (in double braces) under environment, add "29092"
+      # to expose, and replace command with
+      #   entrypoint: [ "/bin/bash", "-c" ]
+      #   command: [ "exec /entrypoint.sh redpanda start --mode dev-container --smp 1 --memory 1G --overprovisioned --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092,native://0.0.0.0:29092 --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092,native://$NATIVE_ADDR:29092" ]
+      # then bootstrap from the address the instance drawer shows, port 29092. It is not here by
+      # default because that placeholder fails the deploy of an instance with no subnet (native
+      # access off).
       command:
         - redpanda
         - start
@@ -17,12 +33,15 @@ spec: |
         - 1G
         - --overprovisioned
         - --kafka-addr
-        - internal://0.0.0.0:9092
+        - internal://0.0.0.0:9092,external://0.0.0.0:19092
         - --advertise-kafka-addr
-        - internal://redpanda:9092
+        - internal://redpanda:9092,external://localhost:19092
       mem_limit: 1536m
-      ports:
+      # The image exposes 9092 but not 19092; declaring it is what makes `fadebox connect` list it.
+      # expose, not ports: neither publishes a host port (needs fadebox 1.5 or later).
+      expose:
         - "9092"
+        - "19092"
       volumes:
         - redpanda-data:/var/lib/redpanda/data
       healthcheck:

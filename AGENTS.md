@@ -38,9 +38,14 @@ Two rules make the update hint work:
 - **Ingress is a label.** `fadebox.ingress.port: "8080"` exposes a container port on the
   instance URL; `fadebox.ingress.path` and `fadebox.ingress.strip` route it by path prefix.
   Published `ports:` are not needed for that.
+- **`expose:` over `ports:` for a port a laptop reaches.** An `expose:` port (`"9092"`,
+  `"9092/tcp"` or an integer; ranges are refused) is listed by `fadebox connect` and native
+  access but never publishes a host port. A `ports:` entry publishes one even without a host
+  number, and a published host port refuses sign-in-gated instances on a static runtime.
+  Templates using `expose:` need fadebox 1.5 or later; 1.4 refuses the key at import.
 - **The Compose subset is static and strict.** Top level: `services`, `networks`, `volumes`
   (`version` and `name` are accepted and ignored). Per service: `image`, `environment`,
-  `ports`, `volumes`, `command`, `entrypoint`, `depends_on`, `healthcheck`, `restart`,
+  `ports`, `expose`, `volumes`, `command`, `entrypoint`, `depends_on`, `healthcheck`, `restart`,
   `networks`, `mem_limit`, `cpus`, `deploy.resources.limits`, `privileged`, `user`, `labels`.
   Anything else — `build:`, `secrets:`, `configs:`, `profiles:`, `x-*` extensions — is refused,
   not ignored, and the refusal names the key.
